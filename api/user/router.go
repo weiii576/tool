@@ -7,7 +7,8 @@ import (
 )
 
 func NewUserRouter(server *gin.Engine, store *storage.PostgresStore, env *configs.Env) {
-	uc := NewUserController(store, env)
+	us := NewUserStorage(store)
+	uc := NewUserController(us, env)
 
 	group := server.Group("/user")
 
