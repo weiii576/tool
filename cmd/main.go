@@ -17,6 +17,8 @@ func main() {
 		log.Fatal("Database connection failed:", err)
 	}
 
+	defer store.Close()
+
 	server := gin.Default()
 
 	api.SetRouter(server, store, env)
