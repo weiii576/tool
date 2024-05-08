@@ -64,3 +64,27 @@ func (uc *UserController) handleCreateUser(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, internal.BuildResponseSuccess(MESSAGE_SUCCESS_CREATE_USER, nil))
 }
+
+func (uc *UserController) handleGetUsers(ctx *gin.Context) {
+	var request internal.PaginationRequest
+
+	if err := ctx.ShouldBind(&request); err != nil {
+		res := internal.BuildResponseFailed(MESSAGE_FAILED_GET_DATA_FROM_BODY, err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	users, pagination, err := uc.UserStorage.GetUsers(&request)
+	if err != nil {
+		res := internal.BuildResponseFailed(MESSAGE_FAILED_GET_USERS, err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	paginationResponse := GetUsersResponse{
+		Users:      *users,
+		Pagination: *pagination,
+	}
+
+	ctx.JSON(http.StatusOK, internal.BuildResponseSuccess(MESSAGE_SUCCESS_GET_USERS, paginationResponse))
+}

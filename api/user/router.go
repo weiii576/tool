@@ -13,4 +13,5 @@ func NewUserRouter(server *gin.Engine, store *storage.PostgresStore, env *config
 	group := server.Group("/user")
 
 	group.POST("", uc.handleCreateUser)
+	group.GET("", uc.handleGetUsers)
 }
