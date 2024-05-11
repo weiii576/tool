@@ -10,19 +10,26 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserController struct {
-	UserStorage UserStorage
-	Env         *configs.Env
-}
+type (
+	UserController interface {
+		handleCreateUser(*gin.Context)
+		handleGetUsers(*gin.Context)
+	}
 
-func NewUserController(userStorage UserStorage, env *configs.Env) *UserController {
-	return &UserController{
+	userController struct {
+		UserStorage UserStorage
+		Env         *configs.Env
+	}
+)
+
+func NewUserController(userStorage UserStorage, env *configs.Env) UserController {
+	return &userController{
 		UserStorage: userStorage,
 		Env:         env,
 	}
 }
 
-func (uc *UserController) handleCreateUser(ctx *gin.Context) {
+func (uc *userController) handleCreateUser(ctx *gin.Context) {
 	var request CreateUserRequest
 
 	if err := ctx.ShouldBind(&request); err != nil {
@@ -65,7 +72,7 @@ func (uc *UserController) handleCreateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, internal.BuildResponseSuccess(MESSAGE_SUCCESS_CREATE_USER, nil))
 }
 
-func (uc *UserController) handleGetUsers(ctx *gin.Context) {
+func (uc *userController) handleGetUsers(ctx *gin.Context) {
 	var request internal.PaginationRequest
 
 	if err := ctx.ShouldBind(&request); err != nil {
