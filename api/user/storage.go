@@ -7,17 +7,24 @@ import (
 	"github.com/weiii576/tool/storage"
 )
 
-type UserStorage struct {
-	Store *storage.PostgresStore
-}
+type (
+	UserStorage interface {
+		CreateUser(*User) error
+		GetUsers(*internal.PaginationRequest) (*[]Profile, *internal.PaginationResponse, error)
+		GetUserByEmail(string) (*User, error)
+	}
+	userStorage struct {
+		Store *storage.PostgresStore
+	}
+)
 
-func NewUserStorage(store *storage.PostgresStore) *UserStorage {
-	return &UserStorage{
+func NewUserStorage(store *storage.PostgresStore) UserStorage {
+	return &userStorage{
 		Store: store,
 	}
 }
 
-func (uc *UserStorage) CreateUser(user *User) error {
+func (uc *userStorage) CreateUser(user *User) error {
 	if result := uc.Store.DB.Create(user); result.Error != nil {
 		return result.Error
 	}
@@ -25,7 +32,7 @@ func (uc *UserStorage) CreateUser(user *User) error {
 	return nil
 }
 
-func (uc *UserStorage) GetUsers(pagination *internal.PaginationRequest) (*[]Profile, *internal.PaginationResponse, error) {
+func (uc *userStorage) GetUsers(pagination *internal.PaginationRequest) (*[]Profile, *internal.PaginationResponse, error) {
 	var users = &[]User{}
 	var profiles = &[]Profile{}
 	var count int64
@@ -65,7 +72,7 @@ func (uc *UserStorage) GetUsers(pagination *internal.PaginationRequest) (*[]Prof
 	}, result.Error
 }
 
-func (uc *UserStorage) GetUserByEmail(email string) (*User, error) {
+func (uc *userStorage) GetUserByEmail(email string) (*User, error) {
 	var user = &User{}
 	result := uc.Store.DB.Where("email = ?", email).First(&user)
 

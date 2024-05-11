@@ -11,11 +11,11 @@ import (
 )
 
 type UserController struct {
-	UserStorage *UserStorage
+	UserStorage UserStorage
 	Env         *configs.Env
 }
 
-func NewUserController(userStorage *UserStorage, env *configs.Env) *UserController {
+func NewUserController(userStorage UserStorage, env *configs.Env) *UserController {
 	return &UserController{
 		UserStorage: userStorage,
 		Env:         env,
