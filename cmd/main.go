@@ -12,12 +12,13 @@ import (
 func main() {
 	env := configs.NewEnv()
 
-	store, err := storage.NewPostgresStore(env)
+	store, err := storage.NewStore(env)
 	if err != nil {
 		log.Fatal("Database connection failed:", err)
 	}
 
-	defer store.Close()
+	db, _ := store.DB()
+	defer db.Close()
 
 	server := gin.Default()
 

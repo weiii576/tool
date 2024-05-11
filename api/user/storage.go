@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/weiii576/tool/internal"
-	"github.com/weiii576/tool/storage"
+	"gorm.io/gorm"
 )
 
 type (
@@ -14,18 +14,18 @@ type (
 		GetUserByEmail(string) (*User, error)
 	}
 	userStorage struct {
-		Store *storage.PostgresStore
+		Store *gorm.DB
 	}
 )
 
-func NewUserStorage(store *storage.PostgresStore) UserStorage {
+func NewUserStorage(store *gorm.DB) UserStorage {
 	return &userStorage{
 		Store: store,
 	}
 }
 
 func (uc *userStorage) CreateUser(user *User) error {
-	if result := uc.Store.DB.Create(user); result.Error != nil {
+	if result := uc.Store.Create(user); result.Error != nil {
 		return result.Error
 	}
 
@@ -46,7 +46,7 @@ func (uc *userStorage) GetUsers(pagination *internal.PaginationRequest) (*[]Prof
 	}
 
 	// get all users
-	query := uc.Store.DB.Model(users)
+	query := uc.Store.Model(users)
 
 	// search for fields
 	if pagination.Search != "" {
@@ -74,7 +74,7 @@ func (uc *userStorage) GetUsers(pagination *internal.PaginationRequest) (*[]Prof
 
 func (uc *userStorage) GetUserByEmail(email string) (*User, error) {
 	var user = &User{}
-	result := uc.Store.DB.Where("email = ?", email).First(&user)
+	result := uc.Store.Where("email = ?", email).First(&user)
 
 	return user, result.Error
 }
